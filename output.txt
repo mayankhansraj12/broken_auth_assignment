@@ -1,0 +1,36 @@
+Task 1 - Login
+
+PS D:\Projects\broken_auth_assignment> $loginBody = @{ email = "mayankhansraj12@gmail.com"; password = "password123" } | ConvertTo-Json
+>> $login = Invoke-RestMethod -Uri "http://localhost:3000/auth/login" -Method Post -ContentType "application/json" -Body $loginBody
+>> $login | ConvertTo-Json -Compress
+>>
+{"message":"OTP sent","loginSessionId":"kj3oq8"}
+PS D:\Projects\broken_auth_assignment> 
+
+
+Task 2 - Verify OTP
+
+PS D:\Projects\broken_auth_assignment> $verifyBody = @{ loginSessionId = "kj3oq8"; otp = "958382" } | ConvertTo-Json
+>> $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+>> Invoke-RestMethod -Uri "http://localhost:3000/auth/verify-otp" -Method Post -ContentType "application/json" -Body $verifyBody -WebSession $session | ConvertTo-Json -Compress
+>>
+{"message":"OTP verified","sessionId":"kj3oq8"}
+PS D:\Projects\broken_auth_assignment> 
+
+
+Task 3 - Get token
+
+PS D:\Projects\broken_auth_assignment> $token = Invoke-RestMethod -Uri "http://localhost:3000/auth/token" -Method Post -WebSession $session
+>> $token | ConvertTo-Json -Compress
+>>
+{"access_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1heWFua2hhbnNyYWoxMkBnbWFpbC5jb20iLCJzZXNzaW9uSWQiOiJrajNvcTgiLCJpYXQiOjE3NzA5OTMzNjIsImV4cCI6MTc3MDk5NDI2Mn0.TfvElY2xgANlzK_Po5Bz73T55KrXfVcwSxe4blC5k74","expires_in":900}
+PS D:\Projects\broken_auth_assignment> 
+
+
+Task 4 - Protected Route
+
+PS D:\Projects\broken_auth_assignment> $headers = @{ Authorization = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1heWFua2hhbnNyYWoxMkBnbWFpbC5jb20iLCJzZXNzaW9uSWQiOiJrajNvcTgiLCJpYXQiOjE3NzA5OTMzNjIsImV4cCI6MTc3MDk5NDI2Mn0.TfvElY2xgANlzK_Po5Bz73T55KrXfVcwSxe4blC5k74" }
+>> Invoke-RestMethod -Uri "http://localhost:3000/protected" -Method Get -Headers $headers | ConvertTo-Json -Compress
+>>
+{"message":"Access granted","user":{"email":"mayankhansraj12@gmail.com","sessionId":"kj3oq8","iat":1770993362,"exp":1770994262},"success_flag":"FLAG-bWF5YW5raGFuc3JhajEyQGdtYWlsLmNvbV9DT01QTEVURURfQVNTSUdOTUVOVA=="}
+PS D:\Projects\broken_auth_assignment> 
